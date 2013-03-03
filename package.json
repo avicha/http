@@ -1,0 +1,29 @@
+{
+  "name": "yi-http",
+  "version": "1.0.0",
+  "description": "对http请求进行了get，post的封装，增加了解码，跳转，超时，代理服务器等功能。",
+  "keywords": [
+    "http",
+    "download",
+    "request",
+    "node"
+  ],
+  "author": "avicha",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/avicha/http.git"
+  },
+  "main": "./index",
+  "engines": {
+    "node": ">= 0.4.x"
+  },
+  "dependencies": {
+    "yi-fs": "1.0.0",
+    "yi-task":"1.0.0",
+    "underscore":"1.4.4",
+    "iconv-lite":"0.2.7",
+  },
+  "devDependencies": {
+    "coffee-script": "1.4.0"
+  }
+}

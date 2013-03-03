@@ -1,4 +1,4 @@
-fs = require 'fs'
+fs = require 'yi-fs'
 path = require 'path'
 qs = require 'querystring'
 url = require 'url'
@@ -54,7 +54,6 @@ requestQueue = new Task 'http request',httpUtil._limitNumber,(options,config,cal
                     console.log res.headers
                     console.log  "Response content:"
                     console.log content.substring 0,1000
-                    requestQueue.info true
                     console.log  "Request #{options.host}:#{options.port}#{options.path} need time #{res.dt}"
                 if res.statusCode == 200
                     if config.buffer
@@ -62,7 +61,7 @@ requestQueue = new Task 'http request',httpUtil._limitNumber,(options,config,cal
                         callback null,buffer,res if !isError
                     else
                         if config.decode
-                            encode = (res.headers && res.headers['content-type'] && /charset=(.*)/.test res.headers['content-type'] && res.headers['content-type'].match(/charset=(.*)/)[1]) || (/charset="(.*?)"/.test content && content.match(/charset="(.*?)"/)[1]) || 'GBK'
+                            encode = (res.headers && res.headers['content-type'] && (/charset=(.*)/.test res.headers['content-type']) && res.headers['content-type'].match(/charset=(.*)/)[1]) || ((/charset="(.*?)"/.test content) && content.match(/charset="(.*?)"/)[1]) || 'GBK'
                             content = iconv.decode buffer, encode
                         if config.format == 'json'
                             try
@@ -99,7 +98,7 @@ requestQueue = new Task 'http request',httpUtil._limitNumber,(options,config,cal
                                 console.log "Rediect to:#{res.headers.location}"
                             jumpUrl = res.headers.location || res.headers.Location
                             config.url = jumpUrl
-                            config.headers['Referer'] = "#{config.protocol}://#{options.host}:#{options.port}#{options.path}"
+                            config.headers['Referer'] = "#{config.protocol}://www.#{options.host}:#{options.port}#{options.path}"
                             complete 1,0
                             httpUtil._request config,callback
                     else
@@ -131,7 +130,7 @@ requestQueue = new Task 'http request',httpUtil._limitNumber,(options,config,cal
             proxyinfo = config.proxy.split ':'
             proxyhost = proxyinfo[0]
             proxyport = proxyinfo[1]||80
-            options.path = "http://#{options.host}:#{options.port}#{options.path}"
+            options.path = "http://www.#{options.host}:#{options.port}#{options.path}"
             options.host = proxyhost
             options.port = proxyport
             options.headers.Host = url.parse(options.path).hostname
@@ -143,7 +142,7 @@ requestQueue = new Task 'http request',httpUtil._limitNumber,(options,config,cal
                     complete 0,1
                     callback err
                 else
-                    options.path = "http://#{options.host}:#{options.port}#{options.path}"
+                    options.path = "http://www.#{options.host}:#{options.port}#{options.path}"
                     options.host = availProxy.ip
                     options.port = availProxy.port
                     options.headers.Host = url.parse(options.path).hostname
@@ -196,7 +195,7 @@ httpUtil._request = (config,callback)->
             else
                 'http'
     options =
-        host : (config.host||'localhost').replace('http://','').replace('https://','')
+        host : (config.host||'localhost').replace('http://','').replace('https://','').replace('www.','')
         port : do ()->
             if config.port
                 config.port
@@ -239,9 +238,9 @@ httpUtil._request = (config,callback)->
         httpUtil._request config, callback  
 httpUtil.download = (source,target,callback)->
     dir = path.dirname target
-    fs.exists dir,(exists)->
-        if !exists
-            callback 'the download dir does not exist.'
+    fs.mkdirp dir,(err)->
+        if err
+            callback err
         else
             httpUtil.get {url:source,buffer:true},(err,buffer)->
                 if err
@@ -249,7 +248,4 @@ httpUtil.download = (source,target,callback)->
                 else
                     fs.writeFile target,buffer,callback
 module.exports = httpUtil
-httpUtil.get 'http://www.baidu.com',(err,data)->
-    console.log err
-    console.log data
             
