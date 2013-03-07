@@ -195,7 +195,7 @@ httpUtil._request = (config,callback)->
             else
                 'http'
     options =
-        host : (config.host||'localhost').replace('http://','').replace('https://','').replace('www.','')
+        host : (config.host||'localhost').replace('http://','').replace('https://','')
         port : do ()->
             if config.port
                 config.port
