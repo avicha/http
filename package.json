@@ -1,6 +1,6 @@
 {
   "name": "yi-http",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "对http请求进行了get，post的封装，增加了解码，跳转，超时，代理服务器等功能。",
   "keywords": [
     "http",
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "yi-fs": "1.0.1",
-    "yi-task":"1.0.0",
+    "yi-task":"1.0.1",
     "underscore":"1.4.4",
     "iconv-lite":"0.2.7"
   },
