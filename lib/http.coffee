@@ -222,10 +222,10 @@ httpUtil._request = (config,callback)->
     if options.method == 'POST' && config.data
         if config.parseData
             options.headers['Content-Type'] = 'application/json; charset=UTF-8'
-            options.headers['Content-length'] = (JSON.stringify config.data).length
+            options.headers['Content-length'] = (new Buffer JSON.stringify config.data).length
         else
             options.headers['Content-Type'] ?= 'application/x-www-form-urlencoded; charset=UTF-8'
-            options.headers['Content-length'] = (_stringifyJSON config.data).length.toString() 
+            options.headers['Content-length'] = (new Buffer _stringifyJSON config.data).length
     if config.log
         console.log '正在发送请求：'
         console.log  options
