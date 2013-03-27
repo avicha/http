@@ -66,24 +66,27 @@ requestQueue = new Task 'http request',httpUtil._limitNumber,(options,config,cal
                         if config.format == 'json'
                             try
                                 json = JSON.parse content.replace /\t/g,''
-                                complete 1,0
-                                callback null,json,res if !isError
                             catch e
                                 complete 0,1
                                 callback "JSON对象转换失败：#{e}，内容是#{content}",content,res  if !isError
+                                return
+                            complete 1,0
+                            callback null,json,res if !isError
+                            
                         else
                             if config.format == 'jsonp'&&config.data&&config.data.callback
                                 try
                                     regex = new RegExp config.data.callback + "\\(\(.*\)\\)"
                                     if regex.test content
-                                        jsonp = JSON.parse content.match(regex)[1].replace /\t/g,''
-                                        complete 1,0
-                                        callback null,jsonp,res if !isError
+                                        jsonp = JSON.parse content.match(regex)[1].replace /\t/g,'' 
                                     else
-                                        throw new Exception "不能匹配jsonp"
+                                        throw new Error "不能匹配jsonp"
                                 catch e
                                     complete 0,1
                                     callback "JSONP对象转换失败：#{e}，内容是#{content}",content,res if !isError
+                                    return
+                                complete 1,0
+                                callback null,jsonp,res if !isError
                             else
                                 complete 1,0
                                 callback null,content,res if !isError
@@ -240,12 +243,21 @@ httpUtil.download = (source,target,callback)->
     dir = path.dirname target
     fs.mkdirp dir,(err)->
         if err
-            callback err
+            if callback
+                callback err
+            else
+                throw new Error err
         else
             httpUtil.get {url:source,buffer:true},(err,buffer)->
                 if err
-                    callback err
+                    if callback
+                        callback err
+                    else
+                        throw new Error err
                 else
-                    fs.writeFile target,buffer,callback
+                    if callback
+                        fs.writeFile target,buffer,callback
+                    else
+                        fs.writeFileSync target,buffer
 module.exports = httpUtil
             
