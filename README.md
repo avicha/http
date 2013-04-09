@@ -65,11 +65,13 @@ http
 ```
     callback  :  回调函数，包含err：错误信息，data：请求返回内容
 
-* http.download(source,target,callback)
+* http.download(source,target,isCover,callback)
     
     source  :  下载文件的源地址
 
     target  :  保存文件的路径和文件名
+
+    isCover :  是否覆盖存在文件
 
     callback  :  下载完毕回调函数，包含err：错误信息
 

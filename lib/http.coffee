@@ -239,25 +239,34 @@ httpUtil._request = (config,callback)->
             config = url:config
         config.method = method
         httpUtil._request config, callback  
-httpUtil.download = (source,target,callback)->
-    dir = path.dirname target
-    fs.mkdirp dir,(err)->
-        if err
-            if callback
-                callback err
-            else
-                throw new Error err
+httpUtil.download = (source,target,isCover,callback)->
+    if !callback
+        if _.isFunction isCover
+            callback = isCover
+            isCover = true
         else
-            httpUtil.get {url:source,buffer:true},(err,buffer)->
-                if err
-                    if callback
-                        callback err
-                    else
-                        throw new Error err
+            isCover ?= true
+    if !isCover && fs.existsSync target
+        callback null if callback
+    else
+        dir = path.dirname target
+        fs.mkdirp dir,(err)->
+            if err
+                if callback
+                    callback err
                 else
-                    if callback
-                        fs.writeFile target,buffer,callback
+                    throw new Error err
+            else
+                httpUtil.get {url:source,buffer:true},(err,buffer)->
+                    if err
+                        if callback
+                            callback err
+                        else
+                            throw new Error err
                     else
-                        fs.writeFileSync target,buffer
+                        if callback
+                            fs.writeFile target,buffer,callback
+                        else
+                            fs.writeFileSync target,buffer
 module.exports = httpUtil
             
